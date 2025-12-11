@@ -1,18 +1,46 @@
 # Status do Projeto - EP2 OAC II
 **Data de Entrega:** 08/12/2025  
-**Data Atual:** 10/12/2025  
-**Status:** ⚠️ ATRASADO (2 dias)
+**Data Atual:** 11/12/2025 (Noite)  
+**Status:** ⚠️ ATRASADO (3 dias) - PROGRESSO SIGNIFICATIVO!
+
+---
+
+## 🚨 RESUMO EXECUTIVO - ATUALIZADO!
+
+### ✅ O QUE TEMOS (ATUALIZADO):
+✅ **Sequencial.c** - COMPLETO (testado 3 resoluções × 10 repetições)  
+✅ **Threads pthread.c** - COMPLETO (testado 15 configurações × 10 repetições)  
+✅ **OpenMP.c** - ✅ **COMPLETO!** (testado 45 configurações × 10 repetições = 450 execuções)  
+✅ **Imagens de teste** - 3 resoluções com pokebola (512, 1024, 4096)  
+✅ **Dados completos** - CSVs de Sequencial, Pthread e OpenMP  
+✅ **Análise OpenMP** - Programa em C para análise estatística  
+
+### ❌ O QUE AINDA FALTA:
+❌ **GPU** (CUDA/OpenMP Target) - Não iniciado  
+❌ **Gráficos** - 3 gráficos obrigatórios não foram gerados  
+❌ **Relatório Final** - Documento não escrito (PDF existente é só o enunciado)  
+
+### 🎯 PRIORIDADE AGORA:
+🔥 **#1: Implementar GPU** (4-6 horas) - AMANHÃ MANHÃ  
+🔥 **#2: Gerar gráficos** (1-2 horas) - AMANHÃ TARDE  
+🔥 **#3: Escrever relatório** (4-6 horas) - AMANHÃ TARDE/NOITE  
+
+### ⏱️ TEMPO RESTANTE ESTIMADO:
+**Total:** ~10-14 horas de trabalho  
+**Prazo realista:** 1-2 dias  
+**Meta de entrega:** 12-13/12/2025
 
 ---
 
 ## 📊 Progresso Geral
 
-**Implementações:** 2/4 (50%) ✅ SEQUENCIAL + PTHREAD COMPLETOS  
-**Testes e Medições:** 66% concluído (Sequencial: 3/3 ✅ | Pthread: 15/15 ✅)  
-**Relatório:** Não iniciado  
-**Gráficos:** Não gerados  
+**Implementações:** 3/4 (75%) ✅ SEQUENCIAL + PTHREAD + OPENMP COMPLETOS!  
+**Testes e Medições:** 95% concluído (Sequencial: 3/3 ✅ | Pthread: 15/15 ✅ | OpenMP: 45/45 ✅ | GPU: 0/6 ❌)  
+**Relatório:** ❌ NÃO INICIADO  
+**Gráficos:** ❌ NÃO GERADOS  
 **Biblioteca STB:** ✅ Submódulo configurado  
-**Imagens de Teste:** ✅ 3 resoluções criadas (512, 1024, 4096)  
+**Imagens de Teste:** ✅ 3 resoluções (512, 1024, 4096) com pokebola  
+**Análise de Dados:** ✅ Programa em C funcionando  
 
 ---
 
@@ -97,15 +125,43 @@
   - 4096×4096: 3.280s (média de 10 execuções)
 - ✅ **Análise comparativa vs pthread** em `ANALISE_SEQUENCIAL_VS_PTHREAD.md`
 
-### 6. Resultados de Testes - Threads pthread
+### 6. Resultados de Testes - Threads pthread ✅ **COMPLETOS!**
 - ✅ **15 imagens processadas** salvas em `pthreads/resultados/`
 - ✅ **CSV com tempos** (`tempos_threads.csv`):
   - 15 linhas de dados (3 resoluções × 5 configs threads)
   - Média e desvio padrão calculados
 - ✅ **Speedup medido (vs Sequencial):**
-  - 512×512: até 1.14x (16 threads)
-  - 1024×1024: até 1.52x (16 threads)
-  - 4096×4096: até 1.70x (16 threads)
+  - 512×512: variável por configuração
+  - 1024×1024: variável por configuração
+  - 4096×4096: variável por configuração
+- ✅ **Testes executados em:** 11/12/2025
+
+### 7. Resultados de Testes - OpenMP ✅ **COMPLETOS!** (NOVO)
+- ✅ **45 imagens processadas** salvas em `openmp/resultados/`
+- ✅ **CSV consolidado** (`tempos_openmp_consolidado.csv`):
+  - 45 linhas de dados (3 resoluções × 3 estratégias × 5 configs threads)
+  - Média e desvio padrão calculados para cada configuração
+- ✅ **3 estratégias testadas:**
+  - ✅ `schedule(static)` - 15 configurações
+  - ✅ `schedule(dynamic)` - 15 configurações
+  - ✅ `collapse(2)` - 15 configurações
+- ✅ **Total de execuções:** 450 (45 configs × 10 repetições)
+- ✅ **Programa de análise em C** (`analisar_resultados.c`) criado e funcional
+- ✅ **Documentação completa:**
+  - `ANALISE_RESULTADOS.txt` - Tabelas e estatísticas
+  - `CONCLUSOES.md` - Análise detalhada das estratégias
+  - `COMO_USAR.md` - Instruções de uso
+  - `README.md` - Documentação técnica
+- ✅ **Testes executados em:** 11/12/2025
+
+### 8. Análise Comparativa OpenMP ✅ **CONCLUÍDA!**
+- ✅ **Melhor estratégia identificada:** `schedule(static)` (60% de vitórias)
+- ✅ **Melhor speedup alcançado:** 5.39x (512×512 com 8 threads + static)
+- ✅ **Pior estratégia:** `collapse(2)` (nunca foi a melhor)
+- ✅ **Configurações ótimas determinadas:**
+  - 512×512: 8 threads + static
+  - 1024×1024: 16 threads + static
+  - 4096×4096: 4 threads + static
 
 ---
 
@@ -113,22 +169,23 @@
 
 ### 1. Novas Implementações Obrigatórias
 
-#### Versão 3: OpenMP (NÃO INICIADA) - PRIORIDADE ALTA
-- [ ] Criar arquivo `OpenMP.c`
-- [ ] Implementar convolução com `#pragma omp parallel for`
-- [ ] **Testar 3 estratégias de escalonamento (OBRIGATÓRIO pelo enunciado):**
-  - [ ] `schedule(static)` - distribuição estática
-  - [ ] `schedule(dynamic)` - distribuição dinâmica
-  - [ ] `collapse(2)` - colapsar loops aninhados
-- [ ] Integrar com stb_image para carregar/salvar PNG
-- [ ] Adicionar medição de tempo (média de 10 execuções + desvio padrão)
-- [ ] Aceitar número de threads como argumento (`OMP_NUM_THREADS` ou setenv)
-- [ ] Testar com threads: 1, 2, 4, 8
-- [ ] Testar com as 3 resoluções: 512×512, 1024×1024, 4096×4096
-- [ ] **Comparar desempenho das 3 estratégias** (análise obrigatória)
-- [ ] Gerar dados de tempo em formato CSV ou similar
+#### Versão 3: OpenMP - ✅ **CONCLUÍDA!**
+- ✅ Arquivo `OpenMP.c` criado
+- ✅ Convolução implementada com `#pragma omp parallel for`
+- ✅ **3 estratégias de escalonamento testadas (OBRIGATÓRIO):**
+  - ✅ `schedule(static)` - distribuição estática
+  - ✅ `schedule(dynamic)` - distribuição dinâmica
+  - ✅ `collapse(2)` - colapsar loops aninhados
+- ✅ Integrado com stb_image para carregar/salvar PNG
+- ✅ Medição de tempo implementada (média de 10 execuções + desvio padrão)
+- ✅ Aceita número de threads e estratégia como argumentos
+- ✅ Testado com threads: 1, 2, 4, 8, 16 (5 configurações)
+- ✅ Testado com as 3 resoluções: 512×512, 1024×1024, 4096×4096
+- ✅ **Desempenho das 3 estratégias comparado** (análise completa gerada)
+- ✅ Dados de tempo em formato CSV (consolidado + detalhados)
+- ✅ **Total:** 45 configurações testadas, 450 execuções realizadas
 
-#### Versão 4: GPU (NÃO INICIADA) - ESCOLHER UMA OPÇÃO
+#### Versão 4: GPU (NÃO INICIADA) - ❌ PRIORIDADE MÁXIMA
 
 **Opção A - CUDA (Recomendado se tiver GPU NVIDIA):**
 - [ ] Criar arquivo `GPU_CUDA.cu`
@@ -677,7 +734,111 @@ saida[idx + 2] = entrada[idx + 2];
 
 ## 🎯 Prioridades Críticas (TOP 10)
 
-### 🔴 ~~URGÊNCIA MÁXIMA~~ ✅ **CONCLUÍDO! (10/12 Noite):**
+### 🔥 PRIORIDADE MÁXIMA - HOJE (11/12):
+
+**✅ PDF Verificado:** O arquivo `EP2OAC_versao_final.pdf` é apenas o **enunciado do trabalho**, não o relatório!
+
+**⚠️ SITUAÇÃO REAL:** Faltam **50% das implementações + relatório completo + gráficos**
+
+#### IMPLEMENTAÇÕES FALTANTES (CRÍTICO):
+
+**1. OpenMP.c - URGENTE!**
+- [ ] Criar arquivo `OpenMP.c` 
+- [ ] Implementar 3 versões com diferentes estratégias:
+  - [ ] Versão 1: `#pragma omp parallel for schedule(static)`
+  - [ ] Versão 2: `#pragma omp parallel for schedule(dynamic)`
+  - [ ] Versão 3: `#pragma omp parallel for collapse(2)`
+- [ ] Integrar com stb_image (carregar/salvar PNG)
+- [ ] Adicionar medição de tempo (10 repetições)
+- [ ] Aceitar parâmetros CLI (input, output, threads, estratégia)
+- [ ] **Testar 45 configurações:** 3 resoluções × 3 estratégias × 5 threads (1,2,4,8,16)
+- **Tempo estimado:** 3-4 horas
+
+**2. GPU (CUDA ou OpenMP Target) - URGENTE!**
+- [ ] Escolher tecnologia (verificar se tem CUDA disponível)
+- [ ] Implementar versão GPU
+- [ ] Se CUDA: fazer versão com e sem shared memory
+- [ ] Medir separadamente: transferência H→D, kernel, transferência D→H
+- [ ] **Testar 6-12 configurações:** 3 resoluções × (1-2 versões) × 10 repetições
+- **Tempo estimado:** 4-6 horas (CUDA) ou 2-3 horas (OpenMP Target)
+
+### 🟠 ALTA PRIORIDADE - DEPOIS DAS IMPLEMENTAÇÕES:
+
+**3. Gerar Gráficos (OBRIGATÓRIO)**
+- [ ] Criar script Python para gerar os 3 gráficos obrigatórios:
+  - [ ] Speedup × Tamanho da imagem
+  - [ ] Speedup × Número de threads
+  - [ ] Tempo total × Técnica
+- [ ] Exportar em alta resolução (PNG 300 DPI + PDF)
+- **Tempo estimado:** 1-2 horas
+
+**4. Escrever Relatório Final (OBRIGATÓRIO)**
+- [ ] Introdução
+- [ ] Metodologia (hardware, software, procedimento)
+- [ ] Resultados experimentais (tabelas + gráficos)
+- [ ] Discussão (7 análises obrigatórias)
+- [ ] Conclusões (responder 5 perguntas do enunciado)
+- [ ] Referências
+- **Tempo estimado:** 4-6 horas
+
+### 🟡 MÉDIA PRIORIDADE - ORGANIZAÇÃO:
+
+**5. Criar Makefile**
+- [ ] Compilar todas as versões com um comando
+- **Tempo estimado:** 30 minutos
+
+**6. Atualizar README.md**
+- [ ] Instruções de compilação
+- [ ] Como executar cada versão
+- [ ] Nomes dos 4 integrantes
+- **Tempo estimado:** 30 minutos
+
+---
+
+## 📅 CRONOGRAMA DE RECUPERAÇÃO URGENTE
+
+### DIA 1 (HOJE - 11/12): 
+**Meta: Implementar OpenMP + começar GPU**
+
+- **08:00-12:00:** Implementar OpenMP.c (4h)
+  - Criar 3 versões com diferentes estratégias
+  - Testar compilação
+- **12:00-13:00:** Almoço
+- **13:00-15:00:** Executar testes OpenMP (2h)
+  - Rodar 45 configurações
+  - Consolidar dados em CSV
+- **15:00-16:00:** Decidir GPU e começar implementação (1h)
+  - Verificar disponibilidade CUDA
+  - Criar estrutura básica
+- **16:00-20:00:** Implementar GPU (4h)
+  - Completar implementação
+  - Executar testes iniciais
+
+### DIA 2 (12/12):
+**Meta: Finalizar testes GPU + Gerar gráficos**
+
+- **08:00-10:00:** Finalizar testes GPU (2h)
+- **10:00-12:00:** Criar script Python e gerar gráficos (2h)
+- **12:00-13:00:** Almoço
+- **13:00-17:00:** Escrever relatório - Parte 1 (4h)
+  - Introdução
+  - Metodologia
+  - Resultados
+- **17:00-20:00:** Escrever relatório - Parte 2 (3h)
+  - Discussão
+  - Conclusões
+
+### DIA 3 (13/12):
+**Meta: Finalizar e entregar**
+
+- **08:00-10:00:** Revisar relatório (2h)
+- **10:00-11:00:** Criar Makefile + README (1h)
+- **11:00-12:00:** Revisão final e empacotamento (1h)
+- **12:00:** **ENTREGAR!**
+
+---
+
+## 🔴 ~~URGÊNCIA MÁXIMA~~ ✅ **CONCLUÍDO! (10/12 Noite):**
 1. **~~Corrigir bug `saia→saida` em Sequencial.c~~** ✅ FEITO
 2. **~~Adicionar medição de tempo em Sequencial.c~~** ✅ FEITO
 3. **~~Recriar imagens de teste (512, 1024, 4096)~~** ✅ FEITO
@@ -773,4 +934,25 @@ saida[idx + 2] = entrada[idx + 2];
 
 ---
 
-**Última atualização:** 10/12/2025 23:17 - ✅ SEQUENCIAL + PTHREAD COMPLETOS (50% do projeto)
+**Última atualização:** 11/12/2025 (Noite) - ✅ 75% CONCLUÍDO!
+
+**PROGRESSO REAL:** 
+- ✅ 75% das implementações (Sequencial + Pthread + OpenMP)
+- ✅ 95% dos testes executados (63 de 66 configurações)
+- ❌ GPU não iniciado (25% faltando)
+- ❌ Relatório não iniciado
+- ❌ Gráficos não gerados
+
+**RESUMO DE TESTES REALIZADOS:**
+- ✅ Sequencial: 3 configurações × 10 repetições = 30 execuções
+- ✅ Pthread: 15 configurações × 10 repetições = 150 execuções  
+- ✅ OpenMP: 45 configurações × 10 repetições = 450 execuções
+- **TOTAL ATÉ AGORA:** 630 execuções do algoritmo documentadas!
+
+**PRÓXIMOS PASSOS (EM ORDEM):**
+1. ⚠️ **URGENTE:** Implementar GPU (CUDA ou OpenMP Target)
+2. 📊 Gerar 3 gráficos obrigatórios
+3. 📝 Escrever relatório final
+4. ✅ Revisar e entregar
+
+**TEMPO ESTIMADO RESTANTE:** 10-14 horas

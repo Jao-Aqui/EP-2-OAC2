@@ -1,0 +1,243 @@
+========================================
+TESTES - Threads pthread
+========================================
+
+Compilando Threads pthread.c...
+✅ Compilação concluída
+
+----------------------------------------
+Testando resolução 512×512
+----------------------------------------
+
+[1/15] Executando: 512×512 com 1 thread(s)...
+Imagem carregada: 512x512 pixels, usando 1 thread(s)
+Executando 10 repetições para medição...
+
+=== RESULTADOS ===
+Tempo médio: 0.025124 s (25.12 ms)
+Desvio padrão: 0.001867 s (1.87 ms)
+Threads: 1
+Resolução: 512x512
+
+resultados/output_512_threads1.png gerado com sucesso!
+✅ Teste concluído
+
+[2/15] Executando: 512×512 com 2 thread(s)...
+Imagem carregada: 512x512 pixels, usando 2 thread(s)
+Executando 10 repetições para medição...
+
+=== RESULTADOS ===
+Tempo médio: 0.013326 s (13.33 ms)
+Desvio padrão: 0.001182 s (1.18 ms)
+Threads: 2
+Resolução: 512x512
+
+resultados/output_512_threads2.png gerado com sucesso!
+✅ Teste concluído
+
+[3/15] Executando: 512×512 com 4 thread(s)...
+Imagem carregada: 512x512 pixels, usando 4 thread(s)
+Executando 10 repetições para medição...
+
+=== RESULTADOS ===
+Tempo médio: 0.007173 s (7.17 ms)
+Desvio padrão: 0.001296 s (1.30 ms)
+Threads: 4
+Resolução: 512x512
+
+resultados/output_512_threads4.png gerado com sucesso!
+✅ Teste concluído
+
+[4/15] Executando: 512×512 com 8 thread(s)...
+Imagem carregada: 512x512 pixels, usando 8 thread(s)
+Executando 10 repetições para medição...
+
+=== RESULTADOS ===
+Tempo médio: 0.007086 s (7.09 ms)
+Desvio padrão: 0.000701 s (0.70 ms)
+Threads: 8
+Resolução: 512x512
+
+resultados/output_512_threads8.png gerado com sucesso!
+✅ Teste concluído
+
+[5/15] Executando: 512×512 com 16 thread(s)...
+Imagem carregada: 512x512 pixels, usando 16 thread(s)
+Executando 10 repetições para medição...
+
+=== RESULTADOS ===
+Tempo médio: 0.007340 s (7.34 ms)
+Desvio padrão: 0.000662 s (0.66 ms)
+Threads: 16
+Resolução: 512x512
+
+resultados/output_512_threads16.png gerado com sucesso!
+✅ Teste concluído
+
+----------------------------------------
+Testando resolução 1024×1024
+----------------------------------------
+
+[6/15] Executando: 1024×1024 com 1 thread(s)...
+Imagem carregada: 1024x1024 pixels, usando 1 thread(s)
+Executando 10 repetições para medição...
+
+=== RESULTADOS ===
+Tempo médio: 0.091495 s (91.49 ms)
+Desvio padrão: 0.002317 s (2.32 ms)
+Threads: 1
+Resolução: 1024x1024
+
+resultados/output_1024_threads1.png gerado com sucesso!
+✅ Teste concluído
+
+[7/15] Executando: 1024×1024 com 2 thread(s)...
+Imagem carregada: 1024x1024 pixels, usando 2 thread(s)
+Executando 10 repetições para medição...
+
+=== RESULTADOS ===
+Tempo médio: 0.051069 s (51.07 ms)
+Desvio padrão: 0.003561 s (3.56 ms)
+Threads: 2
+Resolução: 1024x1024
+
+resultados/output_1024_threads2.png gerado com sucesso!
+✅ Teste concluído
+
+[8/15] Executando: 1024×1024 com 4 thread(s)...
+Imagem carregada: 1024x1024 pixels, usando 4 thread(s)
+Executando 10 repetições para medição...
+
+=== RESULTADOS ===
+Tempo médio: 0.043424 s (43.42 ms)
+Desvio padrão: 0.027899 s (27.90 ms)
+Threads: 4
+Resolução: 1024x1024
+
+resultados/output_1024_threads4.png gerado com sucesso!
+✅ Teste concluído
+
+[9/15] Executando: 1024×1024 com 8 thread(s)...
+Imagem carregada: 1024x1024 pixels, usando 8 thread(s)
+Executando 10 repetições para medição...
+
+=== RESULTADOS ===
+Tempo médio: 0.037208 s (37.21 ms)
+Desvio padrão: 0.005879 s (5.88 ms)
+Threads: 8
+Resolução: 1024x1024
+
+resultados/output_1024_threads8.png gerado com sucesso!
+✅ Teste concluído
+
+[10/15] Executando: 1024×1024 com 16 thread(s)...
+Imagem carregada: 1024x1024 pixels, usando 16 thread(s)
+Executando 10 repetições para medição...
+
+=== RESULTADOS ===
+Tempo médio: 0.035008 s (35.01 ms)
+Desvio padrão: 0.002309 s (2.31 ms)
+Threads: 16
+Resolução: 1024x1024
+
+resultados/output_1024_threads16.png gerado com sucesso!
+✅ Teste concluído
+
+----------------------------------------
+Testando resolução 4096×4096
+----------------------------------------
+
+[11/15] Executando: 4096×4096 com 1 thread(s)...
+Imagem carregada: 4096x4096 pixels, usando 1 thread(s)
+Executando 10 repetições para medição...
+
+=== RESULTADOS ===
+Tempo médio: 1.577065 s (1577.06 ms)
+Desvio padrão: 0.051955 s (51.96 ms)
+Threads: 1
+Resolução: 4096x4096
+
+resultados/output_4096_threads1.png gerado com sucesso!
+✅ Teste concluído
+
+[12/15] Executando: 4096×4096 com 2 thread(s)...
+Imagem carregada: 4096x4096 pixels, usando 2 thread(s)
+Executando 10 repetições para medição...
+
+=== RESULTADOS ===
+Tempo médio: 1.653291 s (1653.29 ms)
+Desvio padrão: 0.265374 s (265.37 ms)
+Threads: 2
+Resolução: 4096x4096
+
+resultados/output_4096_threads2.png gerado com sucesso!
+✅ Teste concluído
+
+[13/15] Executando: 4096×4096 com 4 thread(s)...
+Imagem carregada: 4096x4096 pixels, usando 4 thread(s)
+Executando 10 repetições para medição...
+
+=== RESULTADOS ===
+Tempo médio: 1.260228 s (1260.23 ms)
+Desvio padrão: 0.261936 s (261.94 ms)
+Threads: 4
+Resolução: 4096x4096
+
+resultados/output_4096_threads4.png gerado com sucesso!
+✅ Teste concluído
+
+[14/15] Executando: 4096×4096 com 8 thread(s)...
+Imagem carregada: 4096x4096 pixels, usando 8 thread(s)
+Executando 10 repetições para medição...
+
+=== RESULTADOS ===
+Tempo médio: 1.329877 s (1329.88 ms)
+Desvio padrão: 0.083265 s (83.27 ms)
+Threads: 8
+Resolução: 4096x4096
+
+resultados/output_4096_threads8.png gerado com sucesso!
+✅ Teste concluído
+
+[15/15] Executando: 4096×4096 com 16 thread(s)...
+Imagem carregada: 4096x4096 pixels, usando 16 thread(s)
+Executando 10 repetições para medição...
+
+=== RESULTADOS ===
+Tempo médio: 1.224658 s (1224.66 ms)
+Desvio padrão: 0.193896 s (193.90 ms)
+Threads: 16
+Resolução: 4096x4096
+
+resultados/output_4096_threads16.png gerado com sucesso!
+✅ Teste concluído
+
+
+========================================
+TODOS OS TESTES CONCLUÍDOS!
+========================================
+
+📊 Resultados salvos em:
+   - tempos_threads.csv (dados brutos)
+   - resultados/ (imagens processadas)
+
+📈 Resumo dos tempos (por threads):
+-----------------------------------
+Versao,Largura,Altura,Threads,TempoMedio,DesvioPadrao
+Threads,512,512,1,0.025124,0.001867
+Threads,512,512,2,0.013326,0.001182
+Threads,512,512,4,0.007173,0.001296
+Threads,512,512,8,0.007086,0.000701
+Threads,512,512,16,0.007340,0.000662
+Threads,1024,1024,1,0.091495,0.002317
+Threads,1024,1024,2,0.051069,0.003561
+Threads,1024,1024,4,0.043424,0.027899
+Threads,1024,1024,8,0.037208,0.005879
+Threads,1024,1024,16,0.035008,0.002309
+Threads,4096,4096,1,1.577065,0.051955
+Threads,4096,4096,2,1.653291,0.265374
+Threads,4096,4096,4,1.260228,0.261936
+Threads,4096,4096,8,1.329877,0.083265
+Threads,4096,4096,16,1.224658,0.193896
+
+✅ Script concluído com sucesso!
