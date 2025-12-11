@@ -1,126 +1,106 @@
 #define STB_IMAGE_IMPLEMENTATION
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-
 #include "stb_image.h"
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-// Calcula padding necessário para tornar o valor múltiplo de 3
-int calcular_padding(int tamanho) {
-    return (3 - (tamanho % 3)) % 3;
-}
-
-// Aplica padding (com zeros) em imagem RGB
-unsigned char* aplicar_padding_rgb(
-    unsigned char *img, int w, int h, int canais,
-    int *novo_w, int *novo_h,
-    int *pad_w, int *pad_h
+// Aplica kernel 3×3 em 1 pixel RGB
+// NÃO é chamada para pixels de borda!
+void aplicar_kernel_rgb(
+    unsigned char *img,
+    unsigned char *out,
+    float *kernel,
+    int w, int h,
+    int x, int y
 ) {
-    *pad_w = calcular_padding(w);
-    *pad_h = calcular_padding(h);
+    int half = 1; // kernel 3x3
+    float soma_r = 0.0f;
+    float soma_g = 0.0f;
+    float soma_b = 0.0f;
 
-    *novo_w = w + *pad_w;
-    *novo_h = h + *pad_h;
+    for (int ky = -half; ky <= half; ky++) {
+        for (int kx = -half; kx <= half; kx++) {
 
-    unsigned char *nova_img =
-        calloc((*novo_w) * (*novo_h) * canais, sizeof(unsigned char));
+            int px = x + kx;
+            int py = y + ky;
 
-    for(int y = 0; y < h; y++) {
-        for(int x = 0; x < w; x++) {
-            for(int c = 0; c < canais; c++) {
-                nova_img[(y * (*novo_w) + x) * canais + c] =
-                    img[(y * w + x) * canais + c];
-            }
+            int idx = (py * w + px) * 3;
+            float kval = kernel[(ky + half) * 3 + (kx + half)];
+
+            soma_r += img[idx]     * kval;
+            soma_g += img[idx + 1] * kval;
+            soma_b += img[idx + 2] * kval;
         }
     }
 
-    return nova_img;
-}
-
-// Remove padding previamente aplicado
-unsigned char* remover_padding_rgb(
-    unsigned char *img, int w, int h, int canais,
-    int pad_w, int pad_h,
-    int *orig_w, int *orig_h
-) {
-    *orig_w = w - pad_w;
-    *orig_h = h - pad_h;
-
-    unsigned char *recortada =
-        malloc((*orig_w) * (*orig_h) * canais);
-
-    for(int y = 0; y < *orig_h; y++) {
-        for(int x = 0; x < *orig_w; x++) {
-            for(int c = 0; c < canais; c++) {
-                recortada[(y * (*orig_w) + x) * canais + c] =
-                    img[(y * w + x) * canais + c];
-            }
-        }
-    }
-
-    return recortada;
+    int out_idx = (y * w + x) * 3;
+    out[out_idx]     = (unsigned char)soma_r;
+    out[out_idx + 1] = (unsigned char)soma_g;
+    out[out_idx + 2] = (unsigned char)soma_b;
 }
 
 int main() {
-    char nome_entrada[] = "entrada.png";
-    char nome_padded[]  = "com_padding.png";
-    char nome_saida[]   = "sem_padding.png";
+    int largura, altura, canais;
 
-    int w, h, canais;
-
-    printf("Carregando imagem PNG...\n");
-
-    unsigned char *img = stbi_load(nome_entrada, &w, &h, &canais, 3);
-    canais = 3; // força RGB
-
-    if(!img) {
-        printf("Erro ao carregar %s\n", nome_entrada);
+    // Carrega PNG RGB
+    unsigned char *entrada = stbi_load("entrada.png", &largura, &altura, &canais, 3);
+    if (!entrada) {
+        printf("Erro ao carregar entrada.png\n");
         return 1;
     }
 
-    printf("Imagem carregada: %dx%d (%d canais)\n", w, h, canais);
+    unsigned char *saida = malloc(largura * altura * 3);
+    if (!saida) {
+        printf("Erro ao alocar imagem de saída.\n");
+        stbi_image_free(entrada);
+        return 1;
+    }
 
-    int novo_w, novo_h;
-    int pad_w, pad_h;
+    // Kernel 3×3 simples (blur)
+    float kernel[9] = {
+        1/9.f, 1/9.f, 1/9.f,
+        1/9.f, 1/9.f, 1/9.f,
+        1/9.f, 1/9.f, 1/9.f
+    };
 
-    unsigned char *img_padded =
-        aplicar_padding_rgb(img, w, h, canais, &novo_w, &novo_h, &pad_w, &pad_h);
+    // Percorre a imagem
+    for (int y = 0; y < altura; y++) {
+        for (int x = 0; x < largura; x++) {
 
-    printf("Padding aplicado: +%d largura, +%d altura => %dx%d\n",
-           pad_w, pad_h, novo_w, novo_h);
+            int idx = (y * largura + x) * 3;
 
-    stbi_write_png(nome_padded,
-                   novo_w, novo_h,
-                   canais,
-                   img_padded,
-                   novo_w * canais);
+            // Se é pixel de borda → COPIA SEM FILTRAR
+            if (x == 0 || y == 0 || x == largura - 1 || y == altura - 1) {
+                saia[idx]     = entrada[idx];
+                saia[idx + 1] = entrada[idx + 1];
+                saia[idx + 2] = entrada[idx + 2];
+                continue;
+            }
 
-    printf("Imagem com padding salva como %s\n", nome_padded);
+            // Aplica o kernel nos pixels internos
+            aplicar_kernel_rgb(
+                entrada,
+                saida,
+                kernel,
+                largura,
+                altura,
+                x, y
+            );
+        }
+    }
 
-    // -------- REMOVER PADDING --------
-    int rec_w, rec_h;
+    // Salva PNG de saída
+    if (!stbi_write_png("output.png", largura, altura, 3, saida, largura * 3)) {
+        printf("Erro ao salvar output.png\n");
+    } else {
+        printf("output.png gerado com sucesso.\n");
+    }
 
-    unsigned char *img_recortada =
-        remover_padding_rgb(img_padded, novo_w, novo_h, canais,
-                            pad_w, pad_h, &rec_w, &rec_h);
-
-    printf("Padding removido: imagem volta para %dx%d\n", rec_w, rec_h);
-
-    stbi_write_png(nome_saida,
-                   rec_w, rec_h,
-                   canais,
-                   img_recortada,
-                   rec_w * canais);
-
-    printf("Imagem recortada (original) salva como %s\n", nome_saida);
-
-    // libera memória
-    stbi_image_free(img);
-    free(img_padded);
-    free(img_recortada);
-
+    stbi_image_free(entrada);
+    free(saida);
     return 0;
 }
 
