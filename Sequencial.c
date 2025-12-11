@@ -13,7 +13,7 @@ void aplicar_kernel_rgb(
     unsigned char *img,
     unsigned char *out,
     float *kernel,
-    int w, int h,
+    int larguraAplica, int alturaAplica,
     int x, int y
 ) {
     int half = 1; // kernel 3x3
@@ -27,7 +27,7 @@ void aplicar_kernel_rgb(
             int px = x + kx;
             int py = y + ky;
 
-            int idx = (py * w + px) * 3;
+            int idx = (py * larguraAplica + px) * 3;
             float kval = kernel[(ky + half) * 3 + (kx + half)];
 
             soma_r += img[idx]     * kval;
@@ -36,7 +36,7 @@ void aplicar_kernel_rgb(
         }
     }
 
-    int out_idx = (y * w + x) * 3;
+    int out_idx = (y * larguraAplica + x) * 3;
     out[out_idx]     = (unsigned char)soma_r;
     out[out_idx + 1] = (unsigned char)soma_g;
     out[out_idx + 2] = (unsigned char)soma_b;
@@ -45,7 +45,7 @@ void aplicar_kernel_rgb(
 int main() {
     int largura, altura, canais;
 
-    // Carrega PNG RGB
+    // Carrega PNG RGB, canal 3= RGB
     unsigned char *entrada = stbi_load("entrada.png", &largura, &altura, &canais, 3);
     if (!entrada) {
         printf("Erro ao carregar entrada.png\n");
@@ -59,7 +59,7 @@ int main() {
         return 1;
     }
 
-    // Kernel 3×3 simples (blur)
+    // Kernel 3×3 oferecido (blur)
     float kernel[9] = {
         1/9.f, 1/9.f, 1/9.f,
         1/9.f, 1/9.f, 1/9.f,
@@ -67,30 +67,31 @@ int main() {
     };
 
     // Percorre a imagem
-    for (int y = 0; y < altura; y++) {
-        for (int x = 0; x < largura; x++) {
+ for (int y = 0; y < altura; y++) {
+    for (int x = 0; x < largura; x++) {
 
-            int idx = (y * largura + x) * 3;
+        int idx = (y * largura + x) * 3;
 
-            // Se é pixel de borda → COPIA SEM FILTRAR
-            if (x == 0 || y == 0 || x == largura - 1 || y == altura - 1) {
-                saia[idx]     = entrada[idx];
-                saia[idx + 1] = entrada[idx + 1];
-                saia[idx + 2] = entrada[idx + 2];
-                continue;
-            }
-
-            // Aplica o kernel nos pixels internos
-            aplicar_kernel_rgb(
-                entrada,
-                saida,
-                kernel,
-                largura,
-                altura,
-                x, y
-            );
+        // Se é pixel de borda  para a imagem resultado sem aplicar o kernel
+        if (x == 0 || y == 0 || x == largura - 1 || y == altura - 1) {
+            saida[idx]     = entrada[idx];
+            saida[idx + 1] = entrada[idx + 1];
+            saida[idx + 2] = entrada[idx + 2];
+            continue;
         }
+
+        // Aplica kernel nos pixels internos
+        aplicar_kernel_rgb(
+            entrada,
+            saida,
+            kernel,
+            largura,
+            altura,
+            x, y
+        );
     }
+}
+
 
     // Salva PNG de saída
     if (!stbi_write_png("output.png", largura, altura, 3, saida, largura * 3)) {
