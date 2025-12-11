@@ -1,0 +1,4 @@
+Versao,Largura,Altura,TempoTotal,TempoMedio,DesvioPadrao
+Sequencial,512,512,0.826743,0.082674,0.012808
+Sequencial,1024,1024,4.198554,0.419855,0.085611
+Sequencial,4096,4096,32.801327,3.280133,0.234063

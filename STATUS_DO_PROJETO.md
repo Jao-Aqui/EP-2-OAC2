@@ -7,8 +7,8 @@
 
 ## 📊 Progresso Geral
 
-**Implementações:** 2/4 (50%) ✅  
-**Testes e Medições:** 33% concluído (Threads pthread: 15/15 testes OK)  
+**Implementações:** 2/4 (50%) ✅ SEQUENCIAL + PTHREAD COMPLETOS  
+**Testes e Medições:** 66% concluído (Sequencial: 3/3 ✅ | Pthread: 15/15 ✅)  
 **Relatório:** Não iniciado  
 **Gráficos:** Não gerados  
 **Biblioteca STB:** ✅ Submódulo configurado  
@@ -18,17 +18,32 @@
 
 ## ✅ O QUE JÁ FOI CONCLUÍDO
 
-### 1. Versão Sequencial (`Sequencial.c`)
+### 1. Versão Sequencial (`Sequencial.c`) - ✅ COMPLETA
 - ✅ Carregamento de imagens PNG usando stb_image
 - ✅ Salvamento de imagens PNG usando stb_image_write
 - ✅ Aplicação do kernel 3×3 de blur (média 1/9)
 - ✅ Função de convolução RGB implementada (`aplicar_kernel_rgb`)
 - ✅ Tratamento de bordas (cópia sem filtrar)
-- ⚠️ **PROBLEMAS ENCONTRADOS:**
-  - ❌ Erro de digitação: variável `saia` em vez de `saida` (linha ~80)
-  - ❌ **NÃO TEM MEDIÇÃO DE TEMPO** (obrigatório pelo enunciado)
-  - ❌ Nome de arquivo hardcoded ("entrada.png") - deveria aceitar parâmetro
-  - ❌ Não foi testado com as 3 resoluções obrigatórias (512×512, 1024×1024, 4096×4096)
+- ✅ **Bug `saia` CORRIGIDO!** Agora usa `saida` corretamente
+- ✅ **Medição de tempo implementada** (clock_gettime)
+  - ✅ 10 repetições por teste
+  - ✅ Cálculo de média e desvio padrão
+  - ✅ Mede apenas tempo de convolução (sem I/O)
+- ✅ **Aceita parâmetros CLI** (input, output, num_repetições)
+- ✅ **Exporta 2 tipos de CSV:**
+  - ✅ `tempos_sequencial_<resolução>.csv` (detalhado, 10 linhas)
+  - ✅ `tempos_sequencial.csv` (resumo consolidado)
+- ✅ **Código comentado em português**
+- ✅ **TESTADO COMPLETAMENTE:**
+  - ✅ 3 resoluções: 512×512, 1024×1024, 4096×4096
+  - ✅ 30 execuções totais (3 resoluções × 10 repetições)
+  - ✅ 3 imagens PNG geradas
+  - ✅ CSVs organizados
+- ✅ **Pasta `sequencial/` criada** com:
+  - Script de testes automatizado (`executar_testes.sh`)
+  - 3 imagens processadas em `resultados/`
+  - Arquivos CSV consolidados
+  - Análise comparativa vs pthread
 
 ### 2. Versão com Threads Explícitas (`Threads pthread.c`) ✅ CONCLUÍDA
 - ✅ Estrutura completa com pthread
@@ -60,56 +75,43 @@
 - ✅ Headers `stb_image.h` e `stb_image_write.h` disponíveis
 
 ### 4. Imagens de Teste Preparadas
-- ✅ `img20x20.png` - imagem base (20×20 pixels)
-- ✅ `input_512.png` - 512×512 pixels (125 KB)
-- ✅ `input_1024.png` - 1024×1024 pixels (358 KB)
-- ✅ `input_4096.png` - 4096×4096 pixels (2.5 MB)
+- ✅ `img20x20.png` - imagem base (20×20 pixels) - 4.7 KB
+- ✅ `entrada.png` - imagem para teste manual (96 KB)
+- ✅ `output.png` - resultado de teste manual (114 KB)
+- ✅ **3 resoluções obrigatórias no diretório raiz:**
+  - ✅ `input_512.png` - 512×512 pixels (~125 KB)
+  - ✅ `input_1024.png` - 1024×1024 pixels (~358 KB)
+  - ✅ `input_4096.png` - 4096×4096 pixels (~2.5 MB)
+  - ✅ Criadas com gradiente RGB usando Python PIL
 
-### 5. Resultados de Testes - Threads pthread
+### 5. Resultados de Testes - Versão Sequencial
+- ✅ **3 imagens processadas** salvas em `sequencial/resultados/`
+- ✅ **CSVs gerados:**
+  - `tempos_sequencial.csv` (resumo: 3 linhas)
+  - `tempos_sequencial_512x512.csv` (10 repetições)
+  - `tempos_sequencial_1024x1024.csv` (10 repetições)
+  - `tempos_sequencial_4096x4096.csv` (10 repetições)
+- ✅ **Tempos medidos (baseline para speedup):**
+  - 512×512: 0.083s (média de 10 execuções)
+  - 1024×1024: 0.420s (média de 10 execuções)
+  - 4096×4096: 3.280s (média de 10 execuções)
+- ✅ **Análise comparativa vs pthread** em `ANALISE_SEQUENCIAL_VS_PTHREAD.md`
+
+### 6. Resultados de Testes - Threads pthread
 - ✅ **15 imagens processadas** salvas em `pthreads/resultados/`
 - ✅ **CSV com tempos** (`tempos_threads.csv`):
   - 15 linhas de dados (3 resoluções × 5 configs threads)
   - Média e desvio padrão calculados
-- ✅ **Speedup medido:**
-  - 512×512: até 2.47x (16 threads)
-  - 1024×1024: até 2.77x (16 threads)
-  - 4096×4096: até 6.02x (16 threads)
-- ✅ **Análise documentada** em `RESUMO_RESULTADOS.md`
+- ✅ **Speedup medido (vs Sequencial):**
+  - 512×512: até 1.14x (16 threads)
+  - 1024×1024: até 1.52x (16 threads)
+  - 4096×4096: até 1.70x (16 threads)
 
 ---
 
 ## ❌ O QUE AINDA FALTA
 
-### 1. Corrigir e Completar Implementações Existentes
-
-#### Sequencial.c - Correções Necessárias:
-- [ ] **CRÍTICO:** Corrigir erro de digitação `saia` → `saida` (linha 80)
-- [ ] **OBRIGATÓRIO:** Adicionar medição de tempo usando `clock_gettime()`
-  - Medir APENAS o tempo da convolução (loops), não incluir I/O
-  - Calcular média de 10 execuções
-  - Calcular desvio padrão
-- [ ] Aceitar nome do arquivo de entrada como argumento (não hardcoded)
-- [ ] Aceitar tamanho da imagem ou arquivo específico como parâmetro
-- [ ] Testar com as 3 resoluções obrigatórias (512×512, 1024×1024, 4096×4096)
-- [ ] Gerar relatório de tempo em CSV
-- [ ] Criar pasta `sequencial/` com script de testes
-- [ ] Comparar com resultados do pthread (calcular speedup)
-
-#### ~~Threads pthread.c~~ ✅ **COMPLETO!**
-- ✅ Integrado com stb_image para carregar PNG real
-- ✅ Integrado com stb_image_write para salvar resultado
-- ✅ Convertido de `float*` para `unsigned char*` (formato RGB)
-- ✅ Medição de tempo implementada (10 execuções)
-- ✅ Aceita número de threads como argumento de linha de comando
-- ✅ Aceita arquivo de entrada como argumento
-- ✅ Testado com 1, 2, 4, 8, 16 threads
-- ✅ Sem race conditions (cada thread processa linhas independentes)
-- ✅ Função `aplicar_kernel_rgb` trabalha com RGB (3 canais)
-- ✅ Dados salvos em CSV para comparação com sequencial
-
----
-
-### 2. Novas Implementações Obrigatórias
+### 1. Novas Implementações Obrigatórias
 
 #### Versão 3: OpenMP (NÃO INICIADA) - PRIORIDADE ALTA
 - [ ] Criar arquivo `OpenMP.c`
@@ -215,10 +217,11 @@ Threads,1024,1024,4,0.274320,0.044108
 
 #### Configurações de Teste:
 
-**1. Sequencial:**
-- [ ] 512×512 - 10 execuções
-- [ ] 1024×1024 - 10 execuções
-- [ ] 4096×4096 - 10 execuções
+**1. Sequencial:** ✅ **COMPLETO!**
+- ✅ 512×512 - 10 execuções (média: 0.083s)
+- ✅ 1024×1024 - 10 execuções (média: 0.420s)
+- ✅ 4096×4096 - 10 execuções (média: 3.280s)
+- ✅ **Total: 30 execuções concluídas**
 
 **2. Threads (pthread):** ✅ **COMPLETO!**
 - ✅ 512×512 com 1, 2, 4, 8, 16 threads - 10 execuções cada
@@ -646,19 +649,19 @@ EP-2-OAC2/
 
 ## 🚨 BUGS CRÍTICOS IDENTIFICADOS
 
-### Sequencial.c - Linha 80:
+### ~~Sequencial.c - Linha 80~~ ✅ **CORRIGIDO!**
 ```c
-// ❌ ERRO:
+// ❌ ERRO (ANTES):
 saia[idx]     = entrada[idx];
 saia[idx + 1] = entrada[idx + 1];
 saia[idx + 2] = entrada[idx + 2];
 
-// ✅ CORRETO:
+// ✅ CORRETO (AGORA):
 saida[idx]     = entrada[idx];
 saida[idx + 1] = entrada[idx + 1];
 saida[idx + 2] = entrada[idx + 2];
 ```
-**Status:** ⚠️ AINDA NÃO CORRIGIDO
+**Status:** ✅ BUG CORRIGIDO - Código compila e executa normalmente
 **Impacto:** Código não compila! Bug trivial mas bloqueante.
 
 ### ~~Threads pthread.c~~ ✅ **TODOS OS PROBLEMAS CORRIGIDOS!**
@@ -674,23 +677,24 @@ saida[idx + 2] = entrada[idx + 2];
 
 ## 🎯 Prioridades Críticas (TOP 10)
 
-### 🔴 URGÊNCIA MÁXIMA (Fazer HOJE):
-1. **Corrigir bug `saia→saida` em Sequencial.c** ⚠️ Bloqueia compilação
-2. **Adicionar medição de tempo em Sequencial.c** (obrigatório pelo enunciado)
-3. **Refatorar Threads pthread.c** para usar stb_image + RGB
-4. **Preparar 3 imagens de entrada** (512, 1024, 4096)
+### 🔴 ~~URGÊNCIA MÁXIMA~~ ✅ **CONCLUÍDO! (10/12 Noite):**
+1. **~~Corrigir bug `saia→saida` em Sequencial.c~~** ✅ FEITO
+2. **~~Adicionar medição de tempo em Sequencial.c~~** ✅ FEITO
+3. **~~Recriar imagens de teste (512, 1024, 4096)~~** ✅ FEITO
+4. **~~Adicionar parâmetros CLI em Sequencial.c~~** ✅ FEITO
+5. **~~Testar Sequencial.c com as 3 resoluções~~** ✅ FEITO
+6. **~~Criar pasta sequencial/ com infraestrutura~~** ✅ FEITO
 
-### 🟠 ALTA PRIORIDADE (Dia 2):
-5. **Implementar OpenMP.c** com as 3 estratégias obrigatórias
-6. **Executar bateria completa de testes** (CPU: Seq + Threads + OpenMP)
-7. **Consolidar dados em CSV** para análise
+### 🟠 ALTA PRIORIDADE (Dia 2 - 11/12):
+7. **Implementar OpenMP.c** com as 3 estratégias obrigatórias
+8. **Executar bateria completa de testes** (OpenMP: 45 configurações)
 
-### 🟡 MÉDIA PRIORIDADE (Dia 3):
-8. **Implementar versão GPU** (CUDA ou OpenMP Target)
-9. **Gerar os 3 gráficos obrigatórios** usando Python/matplotlib
+### 🟡 MÉDIA PRIORIDADE (Dia 3 - 12/12):
+9. **Implementar versão GPU** (CUDA ou OpenMP Target)
+10. **Gerar os 3 gráficos obrigatórios** usando Python/matplotlib
 
-### 🟢 BAIXA PRIORIDADE (Dia 4):
-10. **Escrever relatório completo** respondendo às 5 perguntas obrigatórias
+### 🟢 BAIXA PRIORIDADE (Dia 4 - 13/12):
+11. **Escrever relatório completo** respondendo às 5 perguntas obrigatórias
 
 ---
 
@@ -708,11 +712,13 @@ saida[idx + 2] = entrada[idx + 2];
 - ✅ input_512.png
 - ✅ input_1024.png
 - ✅ input_4096.png
-- ✅ **15 imagens de resultado** salvas (pthreads/resultados/)
+- ✅ **3 imagens de resultado Sequencial** salvas (sequencial/resultados/)
+- ✅ **15 imagens de resultado Pthread** salvas (pthreads/resultados/)
 
 ### Dados:
-- ✅ CSV com tempos e estatísticas (pthreads/resultados/tempos_threads.csv)
-- ✅ 15 linhas de dados (3 resoluções × 5 configs threads × 10 repetições cada)
+- ✅ CSV Sequencial (sequencial/resultados/tempos_sequencial.csv) - 3 linhas
+- ✅ CSV Pthread (pthreads/resultados/tempos_threads.csv) - 15 linhas
+- ✅ CSVs detalhados por resolução (ambas versões)
 - [ ] CSV consolidado com todas as versões (Sequencial + Threads + OpenMP + GPU)
 - [ ] CSV com speedups e eficiências calculadas
 
@@ -732,21 +738,39 @@ saida[idx + 2] = entrada[idx + 2];
 
 ### Organização:
 - [ ] README.md com instruções
-- ✅ Estrutura de pastas organizada (`pthreads/` criada)
+- ✅ Estrutura de pastas organizada (`pthreads/` e `sequencial/` criadas)
+- ✅ Scripts automatizados de teste (ambas versões)
 - [ ] Nomes dos 4 integrantes documentados
 
 ---
 
 ## 🎉 CONQUISTAS RECENTES
 
-### ✅ 10/12/2025 - Threads pthread COMPLETO!
+### ✅ 10/12/2025 23:17 - Sequencial.c TOTALMENTE COMPLETO!
+- **30 execuções concluídas** (3 resoluções × 10 repetições)
+- **Medição de tempo implementada** (clock_gettime)
+- **Parâmetros CLI funcionando** (input, output, num_repetições)
+- **2 tipos de CSV gerados:**
+  - Detalhado por resolução (10 linhas cada)
+  - Resumo consolidado (3 linhas)
+- **Pasta sequencial/ criada** com infraestrutura completa
+- **Análise comparativa vs pthread** em ANALISE_SEQUENCIAL_VS_PTHREAD.md
+- **Speedup pthread medido:** 1.14x (512²), 1.52x (1024²), 1.70x (4096²)
+- **Baseline estabelecido** para comparações futuras
+
+### ✅ 10/12/2025 22:50 - Bug Sequencial.c Corrigido!
+- **Bug `saia` → `saida` CORRIGIDO**
+- Código **compila sem erros** (com `-I./stb`)
+- Código **executa com sucesso**
+- Gera `output.png` corretamente (114 KB)
+
+### ✅ 10/12/2025 22:24 - Threads pthread COMPLETO!
 - **15 testes executados** (3 resoluções × 5 threads)
 - **150 execuções** do algoritmo (10 repetições cada)
-- **Speedup máximo:** 6.02x (4096×4096 com 16 threads)
 - **Código refatorado** e comentado em português
 - **Script automatizado** para testes
-- **Análise documentada** em RESUMO_RESULTADOS.md
+- **Dados exportados** para CSV consolidado
 
 ---
 
-**Última atualização:** 10/12/2025 22:30 - Threads pthread concluído e testado
+**Última atualização:** 10/12/2025 23:17 - ✅ SEQUENCIAL + PTHREAD COMPLETOS (50% do projeto)
