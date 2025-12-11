@@ -1,13 +1,27 @@
+/*
+ * EP2 - Computação de Alto Desempenho
+ * Versão GPU - OpenMP Target Offloading
+ * Convolução 2D com kernel 3×3 executada na GPU
+ * 
+ * FUNCIONAMENTO:
+ * - Usa #pragma omp target para offload na GPU
+ * - Fallback automático para CPU se GPU não disponível
+ * - Mesmo algoritmo das outras versões (blur 3×3)
+ */
+
 #define STB_IMAGE_IMPLEMENTATION
+#include "stb/stb_image.h"
+
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image.h"
-#include "stb_image_write.h"
+#include "stb/stb_image_write.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <math.h>
 #include <omp.h>
 
-//  Função GPU: aplica kernel em toda a imagem (exceto bordas) 
+// Função GPU: aplica kernel em toda a imagem (exceto bordas)
 void aplicar_kernel_gpu(
     unsigned char *img,
     unsigned char *saida,
@@ -17,7 +31,7 @@ void aplicar_kernel_gpu(
 ) {
     int total = largura * altura;
 
-    // Copiar bordas antes (CPU)
+    // Copiar bordas primeiro (na CPU)
     for (int y = 0; y < altura; y++) {
         for (int x = 0; x < largura; x++) {
             if (x == 0 || y == 0 || x == largura - 1 || y == altura - 1) {
@@ -29,7 +43,7 @@ void aplicar_kernel_gpu(
         }
     }
 
-    //  EXECUÇÃO NA GPU VIA OPENMP TARGET
+    // EXECUÇÃO NA GPU VIA OPENMP TARGET
     #pragma omp target teams distribute parallel for \
             map(to: img[0:total*3], kernel[0:9]) \
             map(from: saida[0:total*3])
@@ -61,45 +75,131 @@ void aplicar_kernel_gpu(
     }
 }
 
-//  MAIN 
-int main() {
-    int largura, altura, canais;
-
-    unsigned char *entrada =
-        stbi_load("entrada.png", &largura, &altura, &canais, 3);
-
-    if (!entrada) {
-        printf("Erro ao carregar entrada.png\n");
+// MAIN
+int main(int argc, char *argv[]) {
+    // Verifica argumentos de linha de comando
+    if (argc < 3) {
+        printf("Uso: %s <entrada> <saida> [repeticoes]\n", argv[0]);
+        printf("Exemplo: %s input_512.png output.png 10\n", argv[0]);
         return 1;
     }
 
-    printf("Imagem carregada: %dx%d (%d canais)\n",
-           largura, altura, canais);
+    char *arquivo_entrada = argv[1];
+    char *arquivo_saida = argv[2];
+    int num_repeticoes = (argc >= 4) ? atoi(argv[3]) : 10;
 
+    if (num_repeticoes < 1) {
+        printf("Número de repetições deve ser >= 1\n");
+        return 1;
+    }
+
+    int largura, altura, canais;
+
+    // Carrega imagem PNG
+    unsigned char *entrada = stbi_load(arquivo_entrada, &largura, &altura, &canais, 3);
+    if (!entrada) {
+        printf("Erro ao carregar %s\n", arquivo_entrada);
+        return 1;
+    }
+
+    // Aloca imagem de saída
     unsigned char *saida = malloc(largura * altura * 3);
+    if (!saida) {
+        printf("Erro ao alocar memória para imagem de saída\n");
+        stbi_image_free(entrada);
+        return 1;
+    }
 
-    // Kernel blur 3x3
+    // Kernel blur 3×3
     float kernel[9] = {
         1/9.f, 1/9.f, 1/9.f,
         1/9.f, 1/9.f, 1/9.f,
         1/9.f, 1/9.f, 1/9.f
     };
 
-    double tempoInicio = omp_get_wtime();
-    aplicar_kernel_gpu(entrada, saida, kernel, largura, altura);
-    double tempoFinal = omp_get_wtime();
+    // Array para armazenar tempos de cada repetição
+    double tempos[num_repeticoes];
 
-    printf("Tempo GPU (OpenMP target): %.4f ms\n", (tempoFinal - tempoInicio) * 1000);
+    // Loop para medição de tempo
+    for (int rep = 0; rep < num_repeticoes; rep++) {
+        // Marca tempo de INÍCIO
+        double inicio = omp_get_wtime();
 
-    // Salvar PNG de saída
-    if (!stbi_write_png("saida.png", largura, altura, 3, saida, largura * 3)) {
-        printf("Erro ao salvar saida.png\n");
+        // Executa convolução na GPU
+        aplicar_kernel_gpu(entrada, saida, kernel, largura, altura);
+
+        // Marca tempo de FIM
+        double fim = omp_get_wtime();
+
+        // Calcula tempo decorrido em segundos
+        double tempo_decorrido = fim - inicio;
+        tempos[rep] = tempo_decorrido;
+
+        printf("Repetição %2d/%d: %.6f s\n", rep + 1, num_repeticoes, tempo_decorrido);
+    }
+
+    // Calcula média e desvio padrão dos tempos
+    double soma = 0.0;
+    for (int i = 0; i < num_repeticoes; i++) {
+        soma += tempos[i];
+    }
+    double media = soma / num_repeticoes;
+
+    double soma_quadrados = 0.0;
+    for (int i = 0; i < num_repeticoes; i++) {
+        double diff = tempos[i] - media;
+        soma_quadrados += diff * diff;
+    }
+    double desvio_padrao = sqrt(soma_quadrados / num_repeticoes);
+
+    // Salva imagem de saída
+    if (!stbi_write_png(arquivo_saida, largura, altura, 3, saida, largura * 3)) {
+        printf("Erro ao salvar imagem de saída %s\n", arquivo_saida);
+        free(saida);
+        stbi_image_free(entrada);
         return 1;
     }
 
-    printf("Arquivo salvo: saida.png\n");
+    printf("Imagem salva em: %s\n", arquivo_saida);
 
-    stbi_image_free(entrada);
+    // Exportar para CSV
+    char csv_detalhado[256];
+    char csv_consolidado[256];
+    snprintf(csv_detalhado, sizeof(csv_detalhado), 
+             "gpu/resultados/tempos_gpu_%dx%d.csv", 
+             largura, altura);
+    snprintf(csv_consolidado, sizeof(csv_consolidado), 
+             "gpu/resultados/tempos_gpu_consolidado.csv");
+
+    // CSV DETALHADO: todas as repetições
+    FILE *f_det = fopen(csv_detalhado, "w");
+    if (f_det) {
+        fprintf(f_det, "Repeticao,Largura,Altura,Tempo\n");
+        for (int i = 0; i < num_repeticoes; i++) {
+            fprintf(f_det, "%d,%d,%d,%.6f\n", 
+                    i + 1, largura, altura, tempos[i]);
+        }
+        fclose(f_det);
+        printf("Dados detalhados salvos em: %s\n", csv_detalhado);
+    }
+
+    // CSV CONSOLIDADO
+    FILE *f_cons = fopen(csv_consolidado, "a");
+    if (f_cons) {
+        // Se arquivo está vazio, escreve cabeçalho
+        fseek(f_cons, 0, SEEK_END);
+        if (ftell(f_cons) == 0) {
+            fprintf(f_cons, "Versao,Largura,Altura,TempoMedio,DesvioPadrao\n");
+        }
+        fprintf(f_cons, "GPU,%d,%d,%.6f,%.6f\n", 
+                largura, altura, media, desvio_padrao);
+        fclose(f_cons);
+        printf("Resumo adicionado em: %s\n", csv_consolidado);
+    }
+
+    // Libera memória
     free(saida);
+    stbi_image_free(entrada);
+
     return 0;
 }

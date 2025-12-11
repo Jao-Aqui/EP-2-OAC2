@@ -1,31 +1,18 @@
 /*
  * EP2 - Computação de Alto Desempenho
  * Versão OPENMP - Convolução 2D com kernel 3×3
- * Suporta 3 estratégias de escalonamento
- * 
- * ESTRATÉGIAS DISPONÍVEIS:
+ * Suporta 3 tipos
  * 
  * 1. SCHEDULE(STATIC):
  *    - Divide as iterações em blocos de tamanho fixo ANTES da execução
  *    - Cada thread recebe um bloco contíguo de linhas
- *    - Baixo overhead, boa localidade de cache
- *    - Ideal para carga balanceada (como processamento uniforme de imagem)
  * 
  * 2. SCHEDULE(DYNAMIC):
  *    - Distribui iterações dinamicamente em TEMPO DE EXECUÇÃO
  *    - Threads pegam novas linhas conforme terminam seu trabalho
- *    - Maior overhead, mas balanceia melhor cargas desiguais
- *    - Ideal quando iterações têm custos variáveis
  * 
  * 3. COLLAPSE(2):
  *    - Colapsa 2 loops aninhados em um único loop paralelo
- *    - Aumenta o número de iterações paralelas (altura × largura)
- *    - Permite maior granularidade de paralelismo
- *    - Útil quando loop externo tem poucas iterações
- * 
- * Uso: ./openmp <entrada> <saida> <threads> <estrategia> [repeticoes]
- * Estratégias: static, dynamic, collapse
- * Exemplo: ./openmp input_512.png output.png 4 static 10
  */
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -36,10 +23,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>  // Para strcmp
+#include <string.h>
 #include <time.h>
 #include <math.h>
-#include <omp.h>  // Biblioteca OpenMP
+#include <omp.h>
 
 // Aplica kernel 3×3 em um único pixel RGB
 // Esta função é thread-safe pois cada thread trabalha em pixels diferentes
@@ -50,12 +37,11 @@ void aplicar_kernel_rgb(
     int largura, int altura,
     int x, int y
 ) {
-    int half = 1; // Raio do kernel 3×3
+    int half = 1;
     float soma_r = 0.0f;
     float soma_g = 0.0f;
     float soma_b = 0.0f;
 
-    // Percorre vizinhança 3×3 ao redor do pixel (x, y)
     for (int ky = -half; ky <= half; ky++) {
         for (int kx = -half; kx <= half; kx++) {
             int px = x + kx;
@@ -70,7 +56,6 @@ void aplicar_kernel_rgb(
         }
     }
 
-    // Escreve resultado no pixel de saída
     int out_idx = (y * largura + x) * 3;
     out[out_idx]     = (unsigned char)soma_r;
     out[out_idx + 1] = (unsigned char)soma_g;
@@ -90,6 +75,7 @@ int main(int argc, char *argv[]) {
     char *arquivo_saida = argv[2];
     int num_threads = atoi(argv[3]);
     char *estrategia = argv[4];
+    // Atoi transforma string em inteiro
     int num_repeticoes = (argc >= 6) ? atoi(argv[5]) : 10;
 
     if (num_threads < 1) {
@@ -115,16 +101,12 @@ int main(int argc, char *argv[]) {
 
     int largura, altura, canais;
 
-    // Carrega imagem PNG (força 3 canais RGB)
+    // Carrega imagem PNG
     unsigned char *entrada = stbi_load(arquivo_entrada, &largura, &altura, &canais, 3);
     if (!entrada) {
         printf("Erro ao carregar %s\n", arquivo_entrada);
         return 1;
     }
-
-    printf("Imagem carregada: %dx%d pixels, %d canais\n", largura, altura, canais);
-    printf("Threads: %d | Repetições: %d | Estratégia: %s\n", 
-           num_threads, num_repeticoes, estrategia);
 
     // Aloca imagem de saída
     unsigned char *saida = malloc(largura * altura * 3);
@@ -134,7 +116,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    // Kernel 3×3 de blur (média simples)
+    // Kernel 3×3 de blur
     float kernel[9] = {
         1/9.f, 1/9.f, 1/9.f,
         1/9.f, 1/9.f, 1/9.f,
@@ -143,21 +125,17 @@ int main(int argc, char *argv[]) {
 
     // Array para armazenar tempos de cada repetição
     double tempos[num_repeticoes];
-    struct timespec inicio, fim;
+    double inicio, fim;
 
-    // ============================================
-    // LOOP DE REPETIÇÕES PARA MEDIÇÃO DE TEMPO
-    // ============================================
+    // Loop para medição de tempo
     for (int rep = 0; rep < num_repeticoes; rep++) {
-        // Marca tempo de INÍCIO (apenas da convolução, não do I/O)
-        clock_gettime(CLOCK_MONOTONIC, &inicio);
+        // Marca tempo de INÍCIO
+        inicio = omp_get_wtime();
 
-        // ==================================================
-        // PARALELIZAÇÃO COM OPENMP - ESTRATÉGIA SELECIONADA
-        // ==================================================
+        // Paralelização com OpenMP - estratégia selecionada
         
         if (strcmp(estrategia, "static") == 0) {
-            // SCHEDULE(STATIC): Divisão estática em blocos fixos
+            // Schedule(static)
             #pragma omp parallel for schedule(static)
             for (int y = 0; y < altura; y++) {
                 for (int x = 0; x < largura; x++) {
@@ -173,7 +151,7 @@ int main(int argc, char *argv[]) {
             }
         } 
         else if (strcmp(estrategia, "dynamic") == 0) {
-            // SCHEDULE(DYNAMIC): Distribuição dinâmica em tempo de execução
+            // Schedule(dynamic)
             #pragma omp parallel for schedule(dynamic)
             for (int y = 0; y < altura; y++) {
                 for (int x = 0; x < largura; x++) {
@@ -189,7 +167,7 @@ int main(int argc, char *argv[]) {
             }
         }
         else if (strcmp(estrategia, "collapse") == 0) {
-            // COLLAPSE(2): Colapsa 2 loops aninhados em um único loop paralelo
+            // Collapse(2)
             #pragma omp parallel for collapse(2)
             for (int y = 0; y < altura; y++) {
                 for (int x = 0; x < largura; x++) {
@@ -206,19 +184,16 @@ int main(int argc, char *argv[]) {
         }
 
         // Marca tempo de FIM
-        clock_gettime(CLOCK_MONOTONIC, &fim);
+        fim = omp_get_wtime();
 
         // Calcula tempo decorrido em segundos
-        double tempo_decorrido = (fim.tv_sec - inicio.tv_sec) + 
-                                 (fim.tv_nsec - inicio.tv_nsec) / 1e9;
+        double tempo_decorrido = fim - inicio;
         tempos[rep] = tempo_decorrido;
 
         printf("Repetição %2d/%d: %.6f s\n", rep + 1, num_repeticoes, tempo_decorrido);
     }
 
-    // ============================================
-    // CÁLCULO DE ESTATÍSTICAS
-    // ============================================
+    // Calcula média e desvio padrão dos tempos
     double soma = 0.0;
     for (int i = 0; i < num_repeticoes; i++) {
         soma += tempos[i];
@@ -232,15 +207,7 @@ int main(int argc, char *argv[]) {
     }
     double desvio_padrao = sqrt(soma_quadrados / num_repeticoes);
 
-    printf("\n========================================\n");
-    printf("RESULTADOS:\n");
-    printf("Tempo médio: %.6f s\n", media);
-    printf("Desvio padrão: %.6f s\n", desvio_padrao);
-    printf("========================================\n");
-
-    // ============================================
-    // SALVAR IMAGEM DE SAÍDA
-    // ============================================
+    // Salva imagem de saída
     if (!stbi_write_png(arquivo_saida, largura, altura, 3, saida, largura * 3)) {
         printf("Erro ao salvar imagem de saída %s\n", arquivo_saida);
         free(saida);
@@ -250,10 +217,7 @@ int main(int argc, char *argv[]) {
 
     printf("Imagem salva em: %s\n", arquivo_saida);
 
-    // ============================================
-    // EXPORTAR DADOS PARA CSV
-    // ============================================
-    // Determina o nome do arquivo CSV baseado na resolução e estratégia
+    // Exportar para CSV
     char csv_detalhado[256];
     char csv_consolidado[256];
     snprintf(csv_detalhado, sizeof(csv_detalhado), 
@@ -274,7 +238,7 @@ int main(int argc, char *argv[]) {
         printf("Dados detalhados salvos em: %s\n", csv_detalhado);
     }
 
-    // CSV CONSOLIDADO: append ao arquivo principal
+    // CSV CONSOLIDADO
     FILE *f_cons = fopen(csv_consolidado, "a");
     if (f_cons) {
         // Se arquivo está vazio, escreve cabeçalho
