@@ -1,14 +1,3 @@
-/*
- * EP2 - Computação de Alto Desempenho
- * Versão GPU - OpenMP Target Offloading
- * Convolução 2D com kernel 3×3 executada na GPU
- * 
- * FUNCIONAMENTO:
- * - Usa #pragma omp target para offload na GPU
- * - Fallback automático para CPU se GPU não disponível
- * - Mesmo algoritmo das outras versões (blur 3×3)
- */
-
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
 
@@ -21,7 +10,6 @@
 #include <math.h>
 #include <omp.h>
 
-// Função GPU: aplica kernel em toda a imagem (exceto bordas)
 void aplicar_kernel_gpu(
     unsigned char *img,
     unsigned char *saida,
@@ -43,7 +31,6 @@ void aplicar_kernel_gpu(
         }
     }
 
-    // EXECUÇÃO NA GPU VIA OPENMP TARGET
     #pragma omp target teams distribute parallel for \
             map(to: img[0:total*3], kernel[0:9]) \
             map(from: saida[0:total*3])
@@ -75,9 +62,7 @@ void aplicar_kernel_gpu(
     }
 }
 
-// MAIN
 int main(int argc, char *argv[]) {
-    // Verifica argumentos de linha de comando
     if (argc < 3) {
         printf("Uso: %s <entrada> <saida> [repeticoes]\n", argv[0]);
         printf("Exemplo: %s input_512.png output.png 10\n", argv[0]);
